@@ -1,6 +1,6 @@
-FROM arm32v6/alpine
+FROM alpine:3.11
 
-COPY ./qemu-arm-static /usr/bin/qemu-arm-static
+#COPY ./qemu-arm-static /usr/bin/qemu-arm-static
 RUN apk --no-cache add curl g++ gcc git make
 RUN mkdir -p /tmp/build
 RUN curl https://raw.githubusercontent.com/ioquake/ioq3/master/misc/linux/server_compile.sh -o /tmp/build/compile.sh
@@ -9,15 +9,13 @@ RUN echo 'y' | sh /tmp/build/compile.sh
 RUN unzip /tmp/build/quake3-latest-pk3s.zip -d /tmp/build/
 RUN cp -r /tmp/build/quake3-latest-pk3s/* ~/ioquake3
 
-FROM arm32v6/alpine
+FROM alpine:3.11
 LABEL maintainer="wouterds <wouter.de.schuyter@gmail.com>"
 
-COPY ./qemu-arm-static /usr/bin/qemu-arm-static
 COPY --from=0 /root/ioquake3 /home/ioq3srv/ioquake3
 RUN ln -sf /data/pak0.pk3 /home/ioq3srv/ioquake3/baseq3/pak0.pk3 && \
   ln -sf /data/server.cfg /home/ioq3srv/ioquake3/baseq3/server.cfg && \
-  adduser ioq3srv -D && \
-  rm /usr/bin/qemu-arm-static
+  adduser ioq3srv -D
 
 USER ioq3srv
 EXPOSE 27960
